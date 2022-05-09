@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import java.io.PipedReader;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import wooteco.subway.dao.LineDao;
+import wooteco.subway.dao.SectionDao;
+import wooteco.subway.dao.StationDao;
 import wooteco.subway.domain.Line;
+import wooteco.subway.domain.Section;
+import wooteco.subway.domain.Station;
 import wooteco.subway.dto.LineRequest;
 import wooteco.subway.dto.LineResponse;
 import wooteco.subway.dto.LineUpdateRequest;
@@ -30,19 +35,32 @@ class LineServiceTest {
     @Mock
     private LineDao lineDao;
 
+    @Mock
+    private StationDao stationDao;
+
+    @Mock
+    private SectionDao sectionDao;
+
     @Test
     @DisplayName("노선을 생성한다.")
     void create() {
         // given
-        given(lineDao.save(any(Line.class))).willReturn(new Line(1L, "1호선", "blue"));
+        Line line = new Line(1L, "1호선", "blue");
+        Station upStation = new Station(1L, "강남역");
+        Station downStation = new Station(2L, "광교역");
+        given(lineDao.save(any(Line.class))).willReturn(line);
+        given(stationDao.findById(1L)).willReturn(Optional.of(upStation));
+        given(stationDao.findById(2L)).willReturn(Optional.of(downStation));
+        given(sectionDao.save(any(Section.class))).willReturn(new Section(1L, line, upStation, downStation, 12));
 
         // when
-        LineResponse lineResponse = lineService.create(new LineRequest("1호선", "blue"));
+        LineResponse lineResponse = lineService.create(new LineRequest("1호선", "blue", 1L, 2L, 12));
 
         // then
         assertThat(lineResponse.getId()).isEqualTo(1L);
         assertThat(lineResponse.getName()).isEqualTo("1호선");
         assertThat(lineResponse.getColor()).isEqualTo("blue");
+        assertThat(lineResponse.getStations()).hasSize(2);
     }
 
     @Test

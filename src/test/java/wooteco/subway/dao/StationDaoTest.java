@@ -35,6 +35,16 @@ public class StationDaoTest {
     }
 
     @Test
+    @DisplayName("지하철 역 조회")
+    void findById() {
+        Station station = stationDao.save(new Station("호호역"));
+
+        Station findStation = stationDao.findById(station.getId()).get();
+
+        assertThat(findStation.getName()).isEqualTo("호호역");
+    }
+
+    @Test
     @DisplayName("지하철 역 전체 조회")
     void findAll() {
         Station station1 = new Station("호호역");
