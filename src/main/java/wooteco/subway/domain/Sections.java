@@ -25,8 +25,7 @@ public class Sections {
 
     public List<Section> findDeleteSections(Line line, Station station) {
         return sections.stream()
-            .filter(value -> value.isEqualToLine(line))
-            .filter(value -> value.isEqualToUpOrDownStation(station))
+            .filter(value -> value.isEqualToLine(line) && value.isEqualToUpOrDownStation(station))
             .collect(Collectors.toList());
     }
 
