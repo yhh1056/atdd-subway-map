@@ -15,6 +15,7 @@ import wooteco.subway.service.dto.request.LineRequest;
 import wooteco.subway.service.dto.request.LineUpdateRequest;
 import wooteco.subway.service.dto.request.SectionRequest;
 import wooteco.subway.service.dto.response.LineResponse;
+import wooteco.subway.service.dto.response.StationResponse;
 
 @Service
 public class LineService {
@@ -42,17 +43,17 @@ public class LineService {
         Line savedLine = lineRepository.save(line);
         sectionRepository.save(new Section(savedLine, upStation, downStation, lineRequest.getDistance()));
 
-        return LineResponse.of(savedLine, List.of(upStation, downStation));
+        return toLineResponse(savedLine, List.of(upStation, downStation));
     }
 
     public LineResponse showById(Long lineId) {
-        return LineResponse.of(findLine(lineId), getStations(lineId));
+        return toLineResponse(findLine(lineId), getStations(lineId));
     }
 
     public List<LineResponse> showAll() {
         List<Line> lines = lineRepository.findAll();
         return lines.stream()
-            .map(line -> LineResponse.of(line, getStations(line.getId())))
+            .map(line -> toLineResponse(line, getStations(line.getId())))
             .collect(Collectors.toList());
     }
 
@@ -108,6 +109,16 @@ public class LineService {
 
     private Line findLine(Long lineId) {
         return lineRepository.findById(lineId);
+    }
+
+    private LineResponse toLineResponse(Line line, List<Station> stations) {
+        return new LineResponse(line.getId(), line.getName(), line.getColor(), toResponse(stations));
+    }
+
+    private static List<StationResponse> toResponse(List<Station> stations) {
+        return stations.stream()
+            .map(station -> new StationResponse(station.getId(), station.getName()))
+            .collect(Collectors.toList());
     }
 
     private List<Station> getStations(Long lineId) {

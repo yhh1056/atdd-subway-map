@@ -18,17 +18,7 @@ public class LineResponse {
         this.color = color;
         this.stations = stations;
     }
-
-    public static LineResponse of(Line line, List<Station> stations) {
-        return new LineResponse(line.getId(), line.getName(), line.getColor(), toResponse(stations));
-    }
-
-    private static List<StationResponse> toResponse(List<Station> stations) {
-        return stations.stream()
-            .map(station -> new StationResponse(station.getId(), station.getName()))
-            .collect(Collectors.toList());
-    }
-
+    
     public Long getId() {
         return id;
     }
